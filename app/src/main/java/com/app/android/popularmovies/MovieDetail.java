@@ -151,7 +151,7 @@ public class MovieDetail extends AppCompatActivity
         // Network Request
         trailerTab();
 
-        getSupportLoaderManager().restartLoader(MOVIE_DETAIL_LOADER_ID, null, this);
+//        getSupportLoaderManager().restartLoader(MOVIE_DETAIL_LOADER_ID, null, this);
     }
 
 
@@ -240,10 +240,12 @@ public class MovieDetail extends AppCompatActivity
     // Creating setting menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
+
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.movie_detail_options, menu);
         mMenu = menu;
+        getSupportLoaderManager().restartLoader(MOVIE_DETAIL_LOADER_ID, null, this);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 
@@ -298,7 +300,7 @@ public class MovieDetail extends AppCompatActivity
         Uri returnUri = getContentResolver().insert(uri, contentValues);
         databaseID = Integer.parseInt(returnUri.getLastPathSegment());
         Toast.makeText(this, "Added to Favorites", Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, databaseID, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, ""+databaseID, Toast.LENGTH_SHORT).show();
 
     }
 

@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="movie_detail">Movie Detail</string>
+    <string name="posterImage">Movie Poster Image</string>
+    <string name="title">Movie Title:</string>
+    <string name="release_date">Release Date:</string>
+    <string name="vote_average">Vote Average:</string>
+    <string name="plot">Plot:</string>
+
+
+    <!--Preferences & Strings-->
+    <string name="action_settings">Settings</string>
+    <string name="action_favorites">Favorites</string>
+    <string name="action_share">Share</string>
+    <string name="action_delete">Delete</string>
+
+    <string name="pref_sort_title">Sort By</string>
+    <string name="pref_sort_label_top_rated">Top Rated</string>
+    <string name="pref_sort_label_most_popular">Most Popular</string>
+    <string name="pref_sort_key" translatable="false">sort_by</string>
+
+    <string name="pref_sort_value_popular" translatable="false">popular</string>
+    <string name="pref_sort_value_top_rated" translatable="false">top_rated</string>
+
+
+    <string name="no_connection">No Internet Connection Available</string>
+</resources>

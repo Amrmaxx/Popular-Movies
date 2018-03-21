@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="pref_sort_labels">
+        <item>@string/pref_sort_label_most_popular</item>
+        <item>@string/pref_sort_label_top_rated</item>
+    </array>
+
+
+    <array name="pref_sort_values">
+        <item>@string/pref_sort_value_popular</item>
+        <item>@string/pref_sort_value_top_rated</item>
+    </array>
+</resources>

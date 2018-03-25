@@ -1,5 +1,8 @@
 package com.app.android.popularmovies.utilities;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 
 import java.io.IOException;
@@ -11,7 +14,6 @@ import java.util.Scanner;
 
 // Class to Handle Network requests
 public final class NetworkUtils {
-
 
     private static final String BASE_MOVIE_URL = "https://api.themoviedb.org/3/";
     private static final String MOVIE_DIRECTORY_URL = "movie";
@@ -103,6 +105,7 @@ public final class NetworkUtils {
     }
 
 
+    // Building Trailer URL
     public static URL buildVideosURL(String movieID) {
         Uri videoUri = Uri.parse(BASE_MOVIE_URL).buildUpon()
                 .appendPath(MOVIE_DIRECTORY_URL)
@@ -118,6 +121,7 @@ public final class NetworkUtils {
         return url;
     }
 
+    //Building Review URL
     public static URL buildReviewsURL(String movieID) {
         Uri reviewUri = Uri.parse(BASE_MOVIE_URL).buildUpon()
                 .appendPath(MOVIE_DIRECTORY_URL)
@@ -131,6 +135,14 @@ public final class NetworkUtils {
             e.printStackTrace();
         }
         return url;
+    }
+
+    // Public method to check internet availability returns true if internet is available
+    public static boolean checkInternet(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null;
+
     }
 }
 

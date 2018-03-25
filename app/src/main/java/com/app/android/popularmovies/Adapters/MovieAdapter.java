@@ -44,8 +44,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         // Creating View for inflation
         View view = LayoutInflater.from(mContext).inflate(movieItemID, parent, false);
-        MovieAdapterViewHolder viewHolder = new MovieAdapterViewHolder(view);
-        return viewHolder;
+        return new MovieAdapterViewHolder(view);
     }
 
     @Override

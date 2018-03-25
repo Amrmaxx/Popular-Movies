@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="2dp"
+    android:background="@color/colorPrimaryLight"
+    android:padding="@dimen/margin_or_padding_tiny"
     tools:context="com.app.android.popularmovies.MainActivity">
-
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/movie_grid_view"
@@ -18,11 +18,14 @@
         android:layout_height="42dp"
         android:layout_gravity="center"
         android:visibility="invisible" />
+
     <TextView
+        android:id="@+id/errorTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="invisible"
-        android:id="@+id/errorTV"
-        android:textSize="20sp"/>
+        android:gravity="center"
+        android:textColor="@color/light"
+        android:textSize="20sp"
+        android:visibility="invisible" />
 </FrameLayout>

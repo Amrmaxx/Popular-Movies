@@ -14,9 +14,7 @@ public class FetchMovies extends AsyncTask<String, Void, String> {
     private String criteria;
     private String movieID;
 
-    private String test;
-
-    /**
+    /*
      * To run Asynchronous as separate Java class, an interface is needed to execute certain code
      * after completion of the async task. implementing a method to be called in onPostExecute
      */
@@ -56,13 +54,11 @@ public class FetchMovies extends AsyncTask<String, Void, String> {
             default:
                 url = NetworkUtils.buildListURL(criteria);
         }
-        test = url.toString();
+
         try
 
         {
-            String jsonResponse = NetworkUtils.getResponseFromHTTP(url);
-            test = jsonResponse;
-            return jsonResponse;
+            return NetworkUtils.getResponseFromHTTP(url);
 
         } catch (
                 Exception e)

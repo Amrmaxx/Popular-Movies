@@ -4,6 +4,7 @@ package com.app.android.popularmovies.data;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+//  Movie DB Contract
 public class MovieContract {
 
     public static final String CONTENT_AUTHORITY = "com.app.android.popularmovies";
@@ -14,7 +15,7 @@ public class MovieContract {
     public static final class MovieEntry implements BaseColumns {
 
         // Query Uri
-        public static final Uri CONTENT_URI= BASE_CONTENT_URI.buildUpon()
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIE)
                 .build();
 

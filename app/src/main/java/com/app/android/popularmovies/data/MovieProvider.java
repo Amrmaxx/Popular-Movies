@@ -21,6 +21,7 @@ public class MovieProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
+    //  Uri matcher for matching incoming uris
     public static UriMatcher buildUriMatcher() {
 
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -48,10 +49,12 @@ public class MovieProvider extends ContentProvider {
         Cursor retCursor;
 
         switch (match) {
+            // Query for all movies
             case MOVIES:
                 retCursor = db.query(MovieEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            //  Query for single movie
             case MOVIE_WITH_ID:
                 retCursor = db.query(MovieEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
@@ -77,6 +80,7 @@ public class MovieProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         Uri returnUri;
 
+        // Inserting movie with ID
         switch (match) {
             case MOVIE_WITH_ID:
                 long id = db.insert(MovieEntry.TABLE_NAME, null, values);
@@ -95,6 +99,8 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
+
+    // Deleting Movie with ID
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         final SQLiteDatabase db = mMovieDbHelper.getReadableDatabase();
         int match = sUriMatcher.match(uri);

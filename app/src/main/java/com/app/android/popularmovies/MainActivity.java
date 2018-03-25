@@ -1,10 +1,10 @@
 package com.app.android.popularmovies;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +22,7 @@ import com.app.android.popularmovies.Adapters.MovieAdapter;
 import com.app.android.popularmovies.utilities.FetchMovies;
 import com.app.android.popularmovies.utilities.JsonUtils;
 import com.app.android.popularmovies.utilities.Movie;
+import com.app.android.popularmovies.utilities.NetworkUtils;
 
 import java.util.List;
 
@@ -36,20 +37,14 @@ public class MainActivity extends
     private int cardWidth;
     private ProgressBar mProgressBar;
     private TextView errorTV;
+    private String sortBy;
+    private ConnectionBroadcastReceiver mConnectionBroadcastReceiver = new ConnectionBroadcastReceiver();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-//        Testing Fav. activity
-//        Intent intent = new Intent(this, FavoritesActivity.class);
-//        startActivity(intent);
-
-
-
 
         // Getting Ref to UI components
         mRecyclerView = findViewById(R.id.movie_grid_view);
@@ -69,18 +64,33 @@ public class MainActivity extends
         // Registering shared preference change listener
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        String sortBy = sharedPreferences.getString(getResources().getString(R.string.pref_sort_key), getResources().getString(R.string.pref_sort_value_top_rated));
+        sortBy = sharedPreferences.getString(getResources().getString(R.string.pref_sort_key), getResources().getString(R.string.pref_sort_value_top_rated));
 
         // Shows loading indicator
         showLoading();
 
         // check for internet status
-        checkInternet();
-        // Starting Async Task
-        new FetchMovies(this, new BackgroundTaskCompletionListener(), sortBy).execute();
+        if (NetworkUtils.checkInternet(this)) {
 
+            // Starting Async Task if connected
+            new FetchMovies(this, new BackgroundTaskCompletionListener(), sortBy).execute();
+        } else {
+            // If no connection showing error string
+            errorTV.setText(getResources().getString(R.string.no_connection));
+            errorTV.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.INVISIBLE);
+        }
     }
 
+    //  Registering a broadcast receiver to find when internet is back
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        this.registerReceiver(mConnectionBroadcastReceiver, intentFilter);
+    }
+
+    //  Implementing Async task class to load data in back ground
     public class BackgroundTaskCompletionListener implements FetchMovies.AsyncTaskListener<String> {
         @Override
         public void onCompletion(String moviesListString) {
@@ -94,7 +104,6 @@ public class MainActivity extends
         }
     }
 
-
     // In case Preferences changed reload movie list
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -103,8 +112,7 @@ public class MainActivity extends
         new FetchMovies(this, new BackgroundTaskCompletionListener(), sortBy).execute();
     }
 
-
-    /**
+    /*
      * On Click Handler
      * Getting Clicked Movie Index
      * Passing Movie Details as Strings
@@ -123,7 +131,6 @@ public class MainActivity extends
         startActivity(intent);
     }
 
-
     // Creating setting menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -132,6 +139,7 @@ public class MainActivity extends
         return true;
     }
 
+    //  Starting proper Activity from action bar
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // checking which option was clicked
@@ -152,7 +160,6 @@ public class MainActivity extends
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     // This method is to calculate width of child views and number of grid columns with respect to screen width
     private int[] optimizeView() {
@@ -189,25 +196,20 @@ public class MainActivity extends
     private void showLoading() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mProgressBar.setVisibility(View.VISIBLE);
+        errorTV.setVisibility(View.INVISIBLE);
     }
 
     private void finishedLoading() {
         mRecyclerView.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.INVISIBLE);
+        errorTV.setVisibility(View.INVISIBLE);
     }
 
-    private void checkInternet() {
-        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-
-        // If no connection showing error string
-        if (!isConnected) {
-            errorTV.setText(getResources().getString(R.string.no_connection));
-            errorTV.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.INVISIBLE);
-        }
+    // Unregister receiver when leaving app
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mConnectionBroadcastReceiver);
     }
 
     @Override
@@ -218,6 +220,16 @@ public class MainActivity extends
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
-
+    //  When internet is back onReceive will be called
+    //  if internet is back and no data was loaded, will start network request
+    public class ConnectionBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean connected = NetworkUtils.checkInternet(MainActivity.this);
+            if (connected && mAdapter == null) {
+                new FetchMovies(MainActivity.this, new BackgroundTaskCompletionListener(), sortBy).execute();
+            }
+        }
+    }
 }
 

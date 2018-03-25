@@ -68,7 +68,7 @@ public class JsonUtils {
 
     public static List<Movie.MovieData> parseReviewsList(String jsonReviewsList) {
 
-        // Creating array list to save videos
+        // Creating array list to save reviews(Author + Content)
         List<Movie.MovieData> Reviews = new ArrayList<>();
 
         // JSON Parsing

@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
-    android:background="#FFFFFF">
+    android:layout_height="72dp"
+    android:background="@color/light">
 
     <TextView
+        android:id="@+id/favorite_item_TV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/favorite_item_TV"
-        tools:text="Movie Title"
-        android:padding="20dp"
-        />
-</android.support.constraint.ConstraintLayout>
+        android:layout_gravity="center_vertical"
+        android:padding="@dimen/margin_or_padding"
+        android:textColor="@color/dark"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:text="Movie Title" />
+
+    <ImageView
+
+        android:id="@+id/fav_poster"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.3"
+        android:contentDescription="@string/posterImage"
+        android:scaleType="centerCrop" />
+</FrameLayout>

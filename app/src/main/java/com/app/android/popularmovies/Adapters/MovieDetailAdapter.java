@@ -13,6 +13,7 @@ import com.app.android.popularmovies.utilities.Movie;
 
 import java.util.List;
 
+// This adapter is used to populate Trailers and reviews
 public class MovieDetailAdapter extends RecyclerView.Adapter<MovieDetailAdapter.MovieDetailAdapterViewHolder> {
 
     private List<Movie.MovieData> mList;
@@ -35,7 +36,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<MovieDetailAdapter.
     @Override
     public MovieDetailAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        // Getting ID of movie poster item
+        // Getting ID the current tab to select layout
         int movieItemID;
         if (mTabNum == 0) {
             movieItemID = R.layout.trailer_item;
@@ -46,8 +47,7 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<MovieDetailAdapter.
 
         // Creating View for inflation
         View view = LayoutInflater.from(mContext).inflate(movieItemID, parent, false);
-        MovieDetailAdapterViewHolder viewHolder = new MovieDetailAdapterViewHolder(view);
-        return viewHolder;
+        return new MovieDetailAdapterViewHolder(view);
     }
 
     @Override
@@ -66,7 +66,9 @@ public class MovieDetailAdapter extends RecyclerView.Adapter<MovieDetailAdapter.
             extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
+        //  Trailer has 1 text view: Title
         TextView trailer;
+        //  Review got 2 text views: Author and content
         TextView author;
         TextView content;
 

@@ -2,10 +2,11 @@
     <string name="app_name">Popular Movies</string>
     <string name="movie_detail">Movie Detail</string>
     <string name="posterImage">Movie Poster Image</string>
-    <string name="title">Movie Title:</string>
-    <string name="release_date">Release Date:</string>
-    <string name="vote_average">Vote Average:</string>
-    <string name="plot">Plot:</string>
+
+
+    <string name="reviews">Reviews</string>
+    <string name="trailers">Trailers</string>
+    <string name="trailer">Trailer</string>
 
 
     <!--Preferences & Strings-->
@@ -24,4 +25,7 @@
 
 
     <string name="no_connection">No Internet Connection Available</string>
+
+    <string name="play_description">Plays Trailer</string>
+
 </resources>

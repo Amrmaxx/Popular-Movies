@@ -88,6 +88,8 @@ public class Movie {
     }
 
 
+
+    // this class is used to save Movie Trailers(trailer)/Reviews(author, content)
     public static class MovieData {
         private String trailer;
         private String author;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,9 +21,9 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginEnd="16dp"
-            android:layout_toLeftOf="@+id/month_TV"
+            android:layout_toStartOf="@+id/month_TV"
             android:textSize="20sp"
-            tools:text="Batman V Superma n @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @" />
+            tools:text="Batman V Super n @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @" />
 
         <TextView
             android:id="@+id/year_TV"
@@ -87,31 +88,40 @@
                 android:padding="8dp"
                 tools:text="overview" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dark" />
+
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/backGround"
+                android:outlineProvider="background"
+                app:tabGravity="fill"
+                app:tabIndicatorHeight="4dp">
 
                 <android.support.design.widget.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Trailers" />
+                    android:background="@color/light"
+                    android:text="@string/trailers" />
 
                 <android.support.design.widget.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Reviews" />
-
+                    android:background="@color/dark"
+                    android:text="@string/reviews" />
             </android.support.design.widget.TabLayout>
+
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/movie_detail_RV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp">
-
-            </android.support.v7.widget.RecyclerView>
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

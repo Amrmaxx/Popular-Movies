@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context="com.app.android.popularmovies.MovieDetail"
+    android:baselineAligned="false">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="4"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/title_TV"
+                style="@style/HeaderText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@+id/month_TV"
+                android:textSize="20sp"
+                tools:text="Batman V Super n @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @" />
+
+            <TextView
+                android:id="@+id/year_TV"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:gravity="center"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="2015" />
+
+            <TextView
+                android:id="@+id/month_TV"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/year_TV"
+                android:gravity="start"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="SEP" />
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/month_TV"
+                android:layout_marginTop="8dp"
+                android:foregroundGravity="center"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:rating="4"
+                android:scrollbarSize="1dp"
+                android:scrollbarStyle="insideOverlay"
+                android:stepSize="0.1" />
+
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent">
+
+            <ImageView
+                android:id="@+id/back_drop_IV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/posterImage"
+                android:scaleType="centerCrop" />
+        </ScrollView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:background="@color/backGround" />
+
+    </LinearLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/plot_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textColor="@color/colorPrimary"
+                tools:text="overview" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dark" />
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/backGround"
+                android:outlineProvider="background"
+                app:tabGravity="fill"
+                app:tabIndicatorHeight="4dp">
+
+                <android.support.design.widget.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light"
+                    android:text="@string/trailers" />
+
+                <android.support.design.widget.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/dark"
+                    android:text="@string/reviews" />
+            </android.support.design.widget.TabLayout>
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/movie_detail_RV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

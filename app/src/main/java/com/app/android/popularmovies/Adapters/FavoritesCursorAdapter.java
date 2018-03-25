@@ -6,12 +6,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.android.popularmovies.R;
 import com.app.android.popularmovies.data.MovieContract.MovieEntry;
+import com.app.android.popularmovies.utilities.NetworkUtils;
+import com.squareup.picasso.Picasso;
 
-
+//  This class will be used to populate UI with favorite movies
 public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursorAdapter.FavoritesViewHolder> {
 
     private Context mContext;
@@ -20,6 +23,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
 
     public interface FavoritesClickHandler {
         void onFavoriteClick(int index);
+        void onHold(int index);
     }
 
     public FavoritesCursorAdapter(Context context, FavoritesClickHandler clickHandler) {
@@ -31,21 +35,32 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
     public FavoritesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int favoriteItemID = R.layout.favorite_item;
         View view = LayoutInflater.from(mContext).inflate(favoriteItemID, parent, false);
-        FavoritesViewHolder viewHolder = new FavoritesViewHolder(view);
-        return viewHolder;
+        return new FavoritesViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(FavoritesViewHolder holder, int position) {
+
+        // Getting movie ID, Title, Poster from cursor
         int idIndex = mCursor.getColumnIndex(MovieEntry._ID);
         int titleIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_TITLE);
+        int posterIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
 
         mCursor.moveToPosition(position);
 
         final int id = mCursor.getInt(idIndex);
         String title = mCursor.getString(titleIndex);
+        String poster = mCursor.getString(posterIndex);
 
+        String posterUrl = NetworkUtils.buildImageURL(poster, NetworkUtils.BACKDROP);
+
+        // Populating UI
+
+        //  Show image in the favorite item layout with low alpha
+        Picasso.with(mContext).load(posterUrl).into(holder.favPoster);
+        //  setting Tag
         holder.itemView.setTag(id);
+        //  Setting title
         holder.favoriteMovieTitle.setText(title);
     }
 
@@ -75,26 +90,32 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         return tempCursor;
     }
 
-
     public class FavoritesViewHolder
             extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+            implements View.OnClickListener, View.OnLongClickListener {
 
         TextView favoriteMovieTitle;
+        ImageView favPoster;
 
         public FavoritesViewHolder(View itemView) {
             super(itemView);
             favoriteMovieTitle = itemView.findViewById(R.id.favorite_item_TV);
+            favPoster=itemView.findViewById(R.id.fav_poster);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
-
 
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-//            mCursor.moveToPosition(adapterPosition);
             mOnFavoriteClickHandler.onFavoriteClick(adapterPosition);
+        }
 
+        @Override
+        public boolean onLongClick(View v) {
+            int adapterPosition = getAdapterPosition();
+            mOnFavoriteClickHandler.onHold(adapterPosition);
+            return true;
         }
     }
 }

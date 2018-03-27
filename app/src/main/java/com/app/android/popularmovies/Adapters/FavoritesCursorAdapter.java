@@ -14,12 +14,16 @@ import com.app.android.popularmovies.data.MovieContract.MovieEntry;
 import com.app.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //  This class will be used to populate UI with favorite movies
 public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursorAdapter.FavoritesViewHolder> {
 
     private Context mContext;
     private Cursor mCursor;
     private FavoritesClickHandler mOnFavoriteClickHandler;
+    private List<Integer> mSelection = new ArrayList<>();
 
     public interface FavoritesClickHandler {
         void onFavoriteClick(int index);
@@ -27,9 +31,10 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         void onHold(int index);
     }
 
-    public FavoritesCursorAdapter(Context context, FavoritesClickHandler clickHandler) {
+    public FavoritesCursorAdapter(Context context, FavoritesClickHandler clickHandler, List<Integer> selection) {
         mContext = context;
         mOnFavoriteClickHandler = clickHandler;
+        mSelection = selection;
     }
 
     @Override
@@ -63,6 +68,12 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         holder.itemView.setTag(id);
         //  Setting title
         holder.favoriteMovieTitle.setText(title);
+        if (mSelection.contains(position)) {
+            holder.favPoster.setAlpha((float) 0.5);
+
+        } else {
+            holder.favPoster.setAlpha((float) 0.99);
+        }
     }
 
 

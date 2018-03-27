@@ -33,6 +33,7 @@ public class FavoritesActivity
     private Cursor mCursor;
     private static final int MOVIE_LOADER_ID = 7;
     private final static String SCROLL_POSITION = "scroll_position";
+    private final static String SELECTION = "selection";
     private int mScrollPosition;
     private GridLayoutManager layoutManager;
 
@@ -46,6 +47,7 @@ public class FavoritesActivity
 
         if (savedInstanceState != null) {
             mScrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+            mSelection=savedInstanceState.getIntegerArrayList(SELECTION);
         }
 
         // Getting ref to Recycler view
@@ -54,7 +56,7 @@ public class FavoritesActivity
         mRecyclerView.setLayoutManager(layoutManager);
 
         // Creating / setting cursor adapter
-        mAdapter = new FavoritesCursorAdapter(this, FavoritesActivity.this);
+        mAdapter = new FavoritesCursorAdapter(this, FavoritesActivity.this,mSelection);
         mRecyclerView.setAdapter(mAdapter);
 
         // setting divider decoration
@@ -72,6 +74,7 @@ public class FavoritesActivity
 
         // Saving last scroll point
         outState.putInt(SCROLL_POSITION, layoutManager.findLastCompletelyVisibleItemPosition());
+        outState.putIntegerArrayList(SELECTION, (ArrayList<Integer>) mSelection);
     }
 
     // Closing cursor on leaving
@@ -124,13 +127,14 @@ public class FavoritesActivity
 
             if (mSelection.contains(index)) {
                 mSelection.remove(mSelection.indexOf(index));
-                itemView.setAlpha(1);
+//                itemView.setAlpha(1);
 
             } else {
                 //  if movie is not already selected then select
                 mSelection.add(index);
-                itemView.setAlpha((float) 0.5);
+//                itemView.setAlpha((float) 0.5);
             }
+            mAdapter.notifyDataSetChanged();
         }
     }
 

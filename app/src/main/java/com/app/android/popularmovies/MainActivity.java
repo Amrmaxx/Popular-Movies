@@ -51,9 +51,6 @@ public class MainActivity extends
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent intent = new Intent(this, FavoritesActivity.class);
-        startActivity(intent);
-
         // Getting Ref to UI components
         mRecyclerView = findViewById(R.id.movie_grid_view);
         mProgressBar = findViewById(R.id.pb_loading_indicator);

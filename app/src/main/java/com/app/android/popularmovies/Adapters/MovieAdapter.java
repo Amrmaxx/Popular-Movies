@@ -86,7 +86,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             cardView.getLayoutParams().height = (int) (mCardWidth * 1.5);
 
             // Loading image
-            Picasso.with(mContext).load(poster).into(posterView);
+            Picasso.with(mContext).load(poster).error(R.drawable.error).into(posterView);
         }
 
         // Getting position of the item clicked

@@ -24,7 +24,7 @@
         android:layout_below="@+id/review_author_TV"
         android:layout_marginStart="@dimen/margin_or_padding_medium"
         android:ellipsize="end"
-        android:lines="3"
+        android:maxLines="3"
         android:textColor="@color/colorPrimaryDark"
         tools:text="content" />
 

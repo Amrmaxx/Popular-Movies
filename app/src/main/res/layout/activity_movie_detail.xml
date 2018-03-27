@@ -10,8 +10,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="2dp"
-        android:padding="16dp">
+        android:elevation="@dimen/margin_or_padding_tiny"
+        android:padding="@dimen/margin_or_padding">
 
         <TextView
             android:id="@+id/title_TV"
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="@dimen/margin_or_padding"
             android:layout_toStartOf="@+id/month_TV"
             android:textSize="20sp"
             tools:text="Batman V Super n @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @" />
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/month_TV"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/margin_or_padding_medium"
             android:foregroundGravity="center"
             android:isIndicator="true"
             android:numStars="5"
@@ -85,7 +85,8 @@
                 android:id="@+id/plot_TV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:padding="@dimen/margin_or_padding_medium"
+                android:textColor="@color/colorPrimaryDark"
                 tools:text="overview" />
 
             <View
@@ -100,18 +101,16 @@
                 android:background="@color/backGround"
                 android:outlineProvider="background"
                 app:tabGravity="fill"
-                app:tabIndicatorHeight="4dp">
+                app:tabIndicatorHeight="@dimen/margin_or_padding_small">
 
                 <android.support.design.widget.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/light"
                     android:text="@string/trailers" />
 
                 <android.support.design.widget.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/dark"
                     android:text="@string/reviews" />
             </android.support.design.widget.TabLayout>
 
@@ -120,8 +119,8 @@
                 android:id="@+id/movie_detail_RV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
-                android:paddingStart="8dp" />
+                android:paddingEnd="@dimen/margin_or_padding_medium"
+                android:paddingStart="@dimen/margin_or_padding_medium" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -23,6 +23,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
 
     public interface FavoritesClickHandler {
         void onFavoriteClick(int index);
+
         void onHold(int index);
     }
 
@@ -57,7 +58,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         // Populating UI
 
         //  Show image in the favorite item layout with low alpha
-        Picasso.with(mContext).load(posterUrl).into(holder.favPoster);
+        Picasso.with(mContext).load(posterUrl).error(R.drawable.error).into(holder.favPoster);
         //  setting Tag
         holder.itemView.setTag(id);
         //  Setting title
@@ -100,7 +101,7 @@ public class FavoritesCursorAdapter extends RecyclerView.Adapter<FavoritesCursor
         public FavoritesViewHolder(View itemView) {
             super(itemView);
             favoriteMovieTitle = itemView.findViewById(R.id.favorite_item_TV);
-            favPoster=itemView.findViewById(R.id.fav_poster);
+            favPoster = itemView.findViewById(R.id.fav_poster);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }

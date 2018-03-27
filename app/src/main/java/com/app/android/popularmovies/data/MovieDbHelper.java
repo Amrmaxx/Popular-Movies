@@ -46,5 +46,11 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         onCreate(db);
 
+//        if (oldVersion<2) {
+//            db.execSQL("ALTER TABLE "+ MovieEntry.TABLE_NAME + " ADD COLUMN "+ MovieEntry.COLUMN_PLOT+ " TEXT;");
+//        }
+//        if (oldVersion<3) {
+//            db.execSQL("ALTER TABLE "+ MovieEntry.TABLE_NAME + " ADD COLUMN "+ MovieEntry.COLUMN_POSTER+ " TEXT;");
+//        }
     }
 }

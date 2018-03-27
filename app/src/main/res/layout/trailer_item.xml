@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="@dimen/margin_or_padding_medium">
 
     <ImageView
         android:layout_width="32dp"
@@ -19,10 +19,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="@dimen/margin_or_padding_medium"
         android:textColor="@color/dark"
         android:textSize="16sp"
         android:textStyle="bold"
-        tools:text="Trailer 1" />
+        tools:text="Trailer 1"
+        android:lines="1"/>
 
 </LinearLayout>

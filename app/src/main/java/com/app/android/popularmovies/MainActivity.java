@@ -34,11 +34,16 @@ public class MainActivity extends
     private RecyclerView mRecyclerView;
     private MovieAdapter mAdapter;
     private List<Movie> mMovies;
+    private final static String Movies_LIST = "movies";
     private int cardWidth;
     private ProgressBar mProgressBar;
     private TextView errorTV;
     private String sortBy;
     private ConnectionBroadcastReceiver mConnectionBroadcastReceiver = new ConnectionBroadcastReceiver();
+    private final static String SCROLL_POSITION = "scroll_position";
+    private int mScrollPosition;
+    private GridLayoutManager gridLayoutManager;
+    private String savedMoviesListString;
 
 
     @Override
@@ -57,10 +62,25 @@ public class MainActivity extends
         int columns = data[1];
 
         // Setting layout Manager
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columns);
+        gridLayoutManager = new GridLayoutManager(this, columns);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
+        if (savedInstanceState != null) {
+            mScrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+            savedMoviesListString = savedInstanceState.getString(Movies_LIST);
+            mMovies = JsonUtils.parseMoviesList(savedMoviesListString);
+            populateUI();
+            // Scrolling to last scroll point (in case device is rotated)
+            gridLayoutManager.smoothScrollToPosition(mRecyclerView, null, mScrollPosition);
+
+        } else {
+            loadMovies();
+        }
+    }
+
+    // Method to Load Movies from internet
+    private void loadMovies() {
         // Registering shared preference change listener
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -82,6 +102,22 @@ public class MainActivity extends
         }
     }
 
+    // Method to Populate UI with list of Movies
+    private void populateUI() {
+        // Loading Adapter after data arrives
+        mAdapter = new MovieAdapter(MainActivity.this, mMovies, MainActivity.this, cardWidth);
+        mRecyclerView.setAdapter(mAdapter);
+        // removing indicator and showing Recycler view
+        finishedLoading();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SCROLL_POSITION, gridLayoutManager.findLastCompletelyVisibleItemPosition());
+        outState.putString(Movies_LIST, savedMoviesListString);
+    }
+
     //  Registering a broadcast receiver to find when internet is back
     @Override
     protected void onResume() {
@@ -94,13 +130,9 @@ public class MainActivity extends
     public class BackgroundTaskCompletionListener implements FetchMovies.AsyncTaskListener<String> {
         @Override
         public void onCompletion(String moviesListString) {
+            savedMoviesListString = moviesListString;
             mMovies = JsonUtils.parseMoviesList(moviesListString);
-
-            // Loading Adapter after data arrives
-            mAdapter = new MovieAdapter(MainActivity.this, mMovies, MainActivity.this, cardWidth);
-            mRecyclerView.setAdapter(mAdapter);
-            // removing indicator and showing Recycler view
-            finishedLoading();
+            populateUI();
         }
     }
 

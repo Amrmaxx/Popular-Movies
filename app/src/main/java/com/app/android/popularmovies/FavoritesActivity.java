@@ -4,19 +4,18 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.app.android.popularmovies.Adapters.FavoritesCursorAdapter;
 import com.app.android.popularmovies.data.MovieContract.MovieEntry;
@@ -33,6 +32,9 @@ public class FavoritesActivity
     private FavoritesCursorAdapter mAdapter;
     private Cursor mCursor;
     private static final int MOVIE_LOADER_ID = 7;
+    private final static String SCROLL_POSITION = "scroll_position";
+    private int mScrollPosition;
+    private GridLayoutManager layoutManager;
 
     // List to save selected movies to delete more than one at once
     private List<Integer> mSelection = new ArrayList<>();
@@ -42,9 +44,13 @@ public class FavoritesActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
+        if (savedInstanceState != null) {
+            mScrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+        }
+
         // Getting ref to Recycler view
         mRecyclerView = findViewById(R.id.favorites_RV);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(layoutManager);
 
         // Creating / setting cursor adapter
@@ -56,32 +62,17 @@ public class FavoritesActivity
                 layoutManager.getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
-        // Setting item touch helper to be used to delete movie on swipe
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-                //  Deleting movie from fav and updating the RecyclerView
-                int position = (int) viewHolder.itemView.getTag();
-                String idString = Integer.toString(position);
-                Uri uri = MovieEntry.CONTENT_URI.buildUpon().appendPath(idString).build();
-                getContentResolver().delete(uri, null, null);
-                mAdapter.notifyDataSetChanged();
-            }
-        };
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(mRecyclerView);
-
         // Loading movie from DB
         getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Saving last scroll point
+        outState.putInt(SCROLL_POSITION, layoutManager.findLastCompletelyVisibleItemPosition());
+    }
 
     // Closing cursor on leaving
     @Override
@@ -125,17 +116,21 @@ public class FavoritesActivity
     //  implementing onLongClickListener to select multiple movies for deletion
     @Override
     public void onHold(int index) {
-        View itemView = mRecyclerView.getChildAt(index);
+        View itemView = mRecyclerView.getLayoutManager().findViewByPosition(index);
 
         //  Creating a list to save selected items to be deleted.
         //  if movie is selected before remove selection
-        if (mSelection.contains(index)) {
-            mSelection.remove(mSelection.indexOf(index));
-            itemView.setBackgroundColor(getResources().getColor(R.color.light));
-        } else {
-            //  if movie is not already selected then select
-            mSelection.add(index);
-            itemView.setBackgroundColor(getResources().getColor(R.color.selection));
+        if (itemView != null) {
+
+            if (mSelection.contains(index)) {
+                mSelection.remove(mSelection.indexOf(index));
+                itemView.setAlpha(1);
+
+            } else {
+                //  if movie is not already selected then select
+                mSelection.add(index);
+                itemView.setAlpha((float) 0.5);
+            }
         }
     }
 
@@ -154,7 +149,7 @@ public class FavoritesActivity
         // Deleting selected movies
         if (id == R.id.action_delete) {
             if (mSelection.size() == 0) {
-                Toast.makeText(this, "Select Movies First to Delete", Toast.LENGTH_SHORT).show();
+                Snackbar.make(mRecyclerView, "Select Movies First to Delete", Snackbar.LENGTH_SHORT).show();
             } else {
 
                 // Loop throws selected movies to delete
@@ -165,7 +160,8 @@ public class FavoritesActivity
                     Uri uri = MovieEntry.CONTENT_URI.buildUpon().appendPath(idString).build();
                     getContentResolver().delete(uri, null, null);
                 }
-                Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show();
+                mSelection.clear();
+                Snackbar.make(mRecyclerView, mSelection.size() + " Movie(s) were Deleted", Snackbar.LENGTH_SHORT).show();
                 mAdapter.notifyDataSetChanged();
             }
             return true;
@@ -189,6 +185,9 @@ public class FavoritesActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
         mCursor = data;
+
+        // Scrolling to last scroll point (in case device is rotated)
+        layoutManager.scrollToPosition(mScrollPosition);
     }
 
     @Override

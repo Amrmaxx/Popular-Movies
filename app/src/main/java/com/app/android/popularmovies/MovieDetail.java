@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.ShareCompat;
@@ -13,7 +14,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.app.android.popularmovies.Adapters.MovieDetailAdapter;
 import com.app.android.popularmovies.data.MovieContract.MovieEntry;
@@ -48,9 +47,14 @@ public class MovieDetail extends AppCompatActivity
     public static final String EXTRA_VOTE = "extra_vote";
     public static final String EXTRA_PLOT = "extra_plot";
     public static final String EXTRA_ID = "id";
+    public static final String TAB = "tab";
+    private final static String SCROLL_POSITION = "scroll_position";
+    public static final String TRAILER_LIST = "trailers";
+    public static final String REVIEW_LIST = "reviews";
+    public static final String DETAILS_LOADED = "detail_loaded";
     private RecyclerView mRecyclerView;
     private MovieDetailAdapter mAdapter;
-    private int currentTab = 0;
+    private int currentTab;
     private List<Movie.MovieData> mMovieTrailer;
     private List<Movie.MovieData> mMovieReview;
     private int databaseID;
@@ -60,6 +64,11 @@ public class MovieDetail extends AppCompatActivity
     private String backDrop;
     private String voteAverage;
     private String plot;
+    private int mScrollPosition;
+    private GridLayoutManager layoutManager;
+    private String mTrailerString;
+    private String mReviewString;
+    private boolean loaded;
 
     private static final int MOVIE_DETAIL_LOADER_ID = 15;
 
@@ -102,56 +111,106 @@ public class MovieDetail extends AppCompatActivity
         String shortMonthName = monthName(Integer.parseInt(releaseDate.substring(5, 7)));
 
         // Populating UI
-        Picasso.with(this).load(posterUrl).into(backDropIV);
+        Picasso.with(this).load(posterUrl).error(R.drawable.error).into(backDropIV);
         titleTV.setText(title);
         yearTV.setText(releaseDate.substring(0, 4));
         monthTV.setText(shortMonthName);
         ratingBar.setRating(Float.parseFloat(voteAverage) / 2);
         plotTV.setText(plot);
 
+        // Setting up RecyclerView
+        mRecyclerView = findViewById(R.id.movie_detail_RV);
+        layoutManager = new GridLayoutManager(this, 2);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), layoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
+
 
         // Setting tabLayout for trailers and reviews
         final TabLayout tabLayout = findViewById(R.id.tabs);
 
-        if (NetworkUtils.checkInternet(this)) {
-            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                @Override
-                public void onTabSelected(TabLayout.Tab tab) {
-                    switch (tabLayout.getSelectedTabPosition()) {
-                        case 0: {
-                            currentTab = 0;
-                            trailerTab();
-                            break;
-                        }
-                        case 1: {
-                            currentTab = 1;
-                            reviewTab();
-                            break;
-                        }
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tabLayout.getSelectedTabPosition()) {
+                    case 0: {
+                        currentTab = 0;
+                        selectTab(currentTab);
+                        break;
+                    }
+                    case 1: {
+                        currentTab = 1;
+                        selectTab(currentTab);
+                        break;
                     }
                 }
+            }
 
-                @Override
-                public void onTabUnselected(TabLayout.Tab tab) {
-                }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
 
-                @Override
-                public void onTabReselected(TabLayout.Tab tab) {
-                }
-            });
-            mRecyclerView = findViewById(R.id.movie_detail_RV);
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
 
-            // Network Request to trailer tab by default at start
-            trailerTab();
+
+        // Loading data and taking action if savedInstanceState contains data
+        if (savedInstanceState != null) {
+            mScrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+            currentTab = savedInstanceState.getInt(TAB);
+            if (savedInstanceState.getString(TRAILER_LIST) != null) {
+                mTrailerString = savedInstanceState.getString(TRAILER_LIST);
+                mMovieTrailer = JsonUtils.parseVideosList(mTrailerString);
+            }
+            if (savedInstanceState.getString(REVIEW_LIST) != null) {
+                mReviewString = savedInstanceState.getString(REVIEW_LIST);
+                mMovieReview = JsonUtils.parseReviewsList(mReviewString);
+            }
+            loaded = savedInstanceState.getBoolean(DETAILS_LOADED);
+
+            if (loaded) {
+                TabLayout.Tab tab = tabLayout.getTabAt(currentTab);
+                assert tab != null;
+                tab.select();
+                selectTab(currentTab);
+                layoutManager.scrollToPosition(mScrollPosition);
+            } else {
+                tabLayout.setVisibility(View.INVISIBLE);
+            }
+
         } else {
-
-            tabLayout.setVisibility(View.INVISIBLE);
+            // Network Request to trailer tab by default at start if internet available
+            if (NetworkUtils.checkInternet(this)) {
+                loaded = true;
+                selectTab(0);
+            } else {
+                loaded = false;
+                tabLayout.setVisibility(View.INVISIBLE);
+            }
         }
 
         //  Starting loader to find if the movie exists in the DataBase
         getSupportLoaderManager().restartLoader(MOVIE_DETAIL_LOADER_ID, null, this);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Saving last scroll point
+        outState.putInt(SCROLL_POSITION, layoutManager.findLastCompletelyVisibleItemPosition());
+        // Saving last selected Tab
+        outState.putInt(TAB, currentTab);
+        // Saving Trailer List
+        outState.putString(TRAILER_LIST, mTrailerString);
+        // Saving Review List
+        outState.putString(REVIEW_LIST, mReviewString);
+        // Saving loading status
+        outState.putBoolean(DETAILS_LOADED, loaded);
+
+    }
 
     //  Network result to Load Trailers / Reviews,
     public class BackgroundTaskCompletionListener implements FetchMovies.AsyncTaskListener<String> {
@@ -159,53 +218,55 @@ public class MovieDetail extends AppCompatActivity
         public void onCompletion(String listString) {
 
             if (currentTab == 0) {
+                mTrailerString = listString;
                 mMovieTrailer = JsonUtils.parseVideosList(listString);
-                viewTrailers();
             } else {
+                mReviewString = listString;
                 mMovieReview = JsonUtils.parseReviewsList(listString);
-                viewReviews();
             }
+            viewTrailersOrReview();
         }
     }
 
+    // Method to Start network Request based on the current selected Tab
+    private void selectTab(int tab) {
 
-    // Method to start network request for trailers if data not loaded before
-    private void trailerTab() {
-        if (mMovieTrailer == null) {
-            new FetchMovies(this, new BackgroundTaskCompletionListener(), NetworkUtils.VIDEOS_DIRECTORY, movieID).execute();
-        } else {
-            viewTrailers();
+        switch (tab) {
+            case 0:
+                if (mMovieTrailer == null) {
+                    new FetchMovies(this, new BackgroundTaskCompletionListener(), NetworkUtils.VIDEOS_DIRECTORY, movieID).execute();
+                } else {
+                    viewTrailersOrReview();
+                }
+                break;
+
+            case 1:
+                if (mMovieReview == null) {
+                    new FetchMovies(this, new BackgroundTaskCompletionListener(), NetworkUtils.REVIEWS_DIRECTORY, movieID).execute();
+                } else {
+                    viewTrailersOrReview();
+                }
+                break;
         }
     }
 
-    // Method to populate UI with trailers
-    private void viewTrailers() {
-        LinearLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mAdapter = new MovieDetailAdapter(MovieDetail.this, mMovieTrailer, MovieDetail.this, 0);
+    // Method to Populate Trailers / Reviews
+    private void viewTrailersOrReview() {
+
+        switch (currentTab) {
+
+            case 1:
+                layoutManager.setSpanCount(1);
+                mAdapter = new MovieDetailAdapter(MovieDetail.this, mMovieReview, MovieDetail.this, currentTab);
+                break;
+            case 0:
+                layoutManager.setSpanCount(2);
+                mAdapter = new MovieDetailAdapter(MovieDetail.this, mMovieTrailer, MovieDetail.this, currentTab);
+                break;
+        }
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    // Method to start network request for reviews if data not loaded before
-    private void reviewTab() {
-        if (mMovieReview == null) {
-            new FetchMovies(this, new BackgroundTaskCompletionListener(), NetworkUtils.REVIEWS_DIRECTORY, movieID).execute();
-        } else {
-            viewReviews();
-        }
-    }
-
-    // Method to populate UI with reviews
-    private void viewReviews() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mAdapter = new MovieDetailAdapter(MovieDetail.this, mMovieReview, MovieDetail.this, 1);
-        mRecyclerView.setAdapter(mAdapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), layoutManager.getOrientation());
-        mRecyclerView.addItemDecoration(dividerItemDecoration);
-    }
 
     //  Method to get short month name from month number  aka 03 = MAR
     private String monthName(int monthNum) {
@@ -230,9 +291,9 @@ public class MovieDetail extends AppCompatActivity
             View view = mRecyclerView.getLayoutManager().findViewByPosition(index);
             TextView review = view.findViewById(R.id.review_content_TV);
             if (review.getMaxLines() == 3) {
-                review.setLines(0);
+                review.setMaxLines(100);
             } else {
-                review.setLines(3);
+                review.setMaxLines(3);
             }
         }
     }
@@ -286,7 +347,6 @@ public class MovieDetail extends AppCompatActivity
                     .setChooserTitle(title)
                     .setText(Uri.parse(NetworkUtils.YOUTUBE_BASE_URL + key).toString())
                     .startChooser();
-            Toast.makeText(this, "share", Toast.LENGTH_SHORT).show();
             return true;
 
         }
@@ -318,7 +378,9 @@ public class MovieDetail extends AppCompatActivity
 
         // getting the databaseID _ID for the movie inserted, to be used in case user deleted the same movie again from detail activity
         databaseID = Integer.parseInt(returnUri.getLastPathSegment());
-        Toast.makeText(this, "Added to Favorites", Toast.LENGTH_SHORT).show();
+
+
+        Snackbar.make(mRecyclerView, "Added to Favorites", Snackbar.LENGTH_SHORT).show();
     }
 
     private void removeFromFavorites(MenuItem item) {
@@ -331,7 +393,7 @@ public class MovieDetail extends AppCompatActivity
         String idString = Integer.toString(databaseID);
         Uri uri = MovieEntry.CONTENT_URI.buildUpon().appendPath(idString).build();
         getContentResolver().delete(uri, null, null);
-        Toast.makeText(this, "Removed From Favorites", Toast.LENGTH_SHORT).show();
+        Snackbar.make(mRecyclerView, "Removed From Favorites", Snackbar.LENGTH_SHORT).show();
     }
 
     // Loader to find if movie is in DB at start of activity

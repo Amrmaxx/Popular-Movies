@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:background="@color/light">
+    android:layout_height="wrap_content"
+    android:background="@color/backGround">
 
     <TextView
         android:id="@+id/favorite_item_TV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:padding="@dimen/margin_or_padding"
+        android:maxLines="2"
+        android:padding="@dimen/margin_or_padding_medium"
         android:textColor="@color/dark"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fav_poster"
         tools:text="Movie Title" />
 
     <ImageView
-
         android:id="@+id/fav_poster"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0.3"
+        android:layout_height="wrap_content"
         android:contentDescription="@string/posterImage"
         android:scaleType="centerCrop" />
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>

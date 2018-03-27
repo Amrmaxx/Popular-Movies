@@ -160,8 +160,8 @@ public class FavoritesActivity
                     Uri uri = MovieEntry.CONTENT_URI.buildUpon().appendPath(idString).build();
                     getContentResolver().delete(uri, null, null);
                 }
-                mSelection.clear();
                 Snackbar.make(mRecyclerView, mSelection.size() + " Movie(s) were Deleted", Snackbar.LENGTH_SHORT).show();
+                mSelection.clear();
                 mAdapter.notifyDataSetChanged();
             }
             return true;
